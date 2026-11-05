@@ -34,5 +34,7 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-
+'bmkg' => [
+    'adm4' => env('BMKG_ADM4'),
+],
 ];
