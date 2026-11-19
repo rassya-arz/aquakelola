@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('title', 'Ubah Jenis Pakan')
-@section('crumb', 'Jenis Pakan / Ubah')
+@section('crumb', 'Stok & Jenis Pakan / Jenis Pakan / Ubah')
 
 @section('content')
 <h1 class="text-3xl font-normal tracking-tight">Ubah {{ $stock->feed_type }}</h1>

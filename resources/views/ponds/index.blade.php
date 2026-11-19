@@ -19,9 +19,10 @@
                         <tr>
                             <td class="px-4 py-3.5 font-medium">{{ $p->name }}</td>
                             <td class="px-4 py-3.5">{{ $p->fish_type }}</td>
-                            <td class="px-4 py-3.5"><span class="rounded-md px-2.5 py-1 text-xs font-medium {{ $p->status === 'aktif' ? 'bg-brand-50 text-brand-700' : 'bg-slate-100 text-slate-600' }}">{{ ucfirst($p->status) }}</span></td>
+                            <td class="px-4 py-3.5"><span class="rounded-md px-2.5 py-1 text-xs font-medium {{ $p->isAktif() ? 'bg-brand-50 text-brand-700' : ($p->isPerbaikan() ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-600') }}">{{ $p->statusLabel() }}</span></td>
                             <td class="px-4 py-3.5 text-xs text-slate-500">{{ $p->cycleCount('water_qualities') }} pengukuran • {{ $p->cycleCount('feed_transactions') }} pakan • {{ $p->cycleCount('financial_transactions') }} keuangan
-                                @if ($p->isPanen())<span class="mt-1 block text-slate-400">Panen: monitoring pH &amp; pakan nonaktif. Ubah ke Aktif untuk siklus baru.</span>@endif</td>
+                                @if ($p->isPanen())<span class="mt-1 block text-slate-400">Panen: monitoring pH &amp; pakan nonaktif. Ubah ke Aktif untuk siklus baru.</span>@endif
+                                @if ($p->isPerbaikan())<span class="mt-1 block text-slate-400">Perbaikan: monitoring pH &amp; pakan nonaktif sementara. Ubah ke Aktif bila selesai.</span>@endif</td>
                             <td class="px-4 py-3.5">@include('partials.row-actions', ['edit' => route('ponds.edit', $p), 'destroy' => route('ponds.destroy', $p), 'confirm' => 'Hapus '.$p->name.'?'])</td>
                         </tr>
                     @empty

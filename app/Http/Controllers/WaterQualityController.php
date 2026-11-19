@@ -35,13 +35,15 @@ class WaterQualityController extends Controller
             'pond_id' => ['required', Rule::exists('ponds', 'id')->where('status', Pond::STATUS_AKTIF)],
             'ph_level' => ['required', 'numeric', 'between:0,14'],
             'measured_at' => ['nullable', 'date', 'before_or_equal:now'],
+            'catatan' => ['nullable', 'string', 'max:255'],
         ], [
             'pond_id.required' => 'Pilih kolam yang diukur.',
-            'pond_id.exists' => 'Kolam berstatus panen. Ubah status kolam menjadi Aktif di Data Kolam sebelum monitoring pH.',
+            'pond_id.exists' => 'Kolam sedang tidak aktif (panen atau perbaikan). Ubah status kolam menjadi Aktif di Data Kolam sebelum monitoring pH.',
             'ph_level.required' => 'Nilai pH wajib diisi.',
             'ph_level.numeric' => 'Nilai pH harus berupa angka.',
             'ph_level.between' => 'Nilai pH harus antara 0 dan 14.',
             'measured_at.before_or_equal' => 'Waktu pengukuran tidak boleh di masa depan.',
+            'catatan.max' => 'Catatan maksimal 255 karakter.',
         ]);
 
         $ph = round((float) $data['ph_level'], 2);
@@ -51,6 +53,7 @@ class WaterQualityController extends Controller
             'ph_level' => $ph,
             'status' => WaterQuality::resolveStatus($ph),
             'measured_at' => $data['measured_at'] ?? now(),
+            'catatan' => $data['catatan'] ?? null,
             'user_id' => $request->user()->id,
         ]);
 

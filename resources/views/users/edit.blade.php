@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('title', 'Ubah Pengguna')
-@section('crumb', 'Pengguna / Ubah')
+@section('crumb', 'Manajemen Pengguna / Ubah')
 
 @section('content')
 <h1 class="text-3xl font-normal tracking-tight">Ubah akun {{ $user->name }}</h1>

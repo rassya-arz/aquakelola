@@ -170,7 +170,7 @@ class FeedController extends Controller
             'notes' => ['nullable', 'string', 'max:255'],
         ], [
             'pond_id.required_if' => 'Pilih kolam tujuan untuk pemakaian pakan.',
-            'pond_id.exists' => 'Kolam berstatus panen. Ubah status kolam menjadi Aktif di Data Kolam sebelum memberi pakan.',
+            'pond_id.exists' => 'Kolam sedang tidak aktif (panen atau perbaikan). Ubah status kolam menjadi Aktif di Data Kolam sebelum memberi pakan.',
             'quantity.required' => 'Jumlah pakan wajib diisi.',
             'quantity.gt' => 'Jumlah pakan harus lebih dari 0.',
             'quantity.decimal' => 'Jumlah pakan maksimal 2 angka di belakang koma.',

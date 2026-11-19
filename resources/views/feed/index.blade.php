@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'Stok Pakan')
-@section('crumb', 'Stok Pakan')
+@section('title', 'Stok & Jenis Pakan')
+@section('crumb', 'Stok & Jenis Pakan')
 
 @section('content')
 @php
@@ -10,8 +10,11 @@
     ]]);
 @endphp
 
-<h1 class="text-3xl font-normal tracking-tight">Stok pakan</h1>
+<h1 class="text-3xl font-normal tracking-tight">Stok &amp; jenis pakan</h1>
 <p class="mt-2 text-sm text-slate-500">{{ $canWrite ? 'Pantau persediaan dan catat pakan masuk atau pemakaian harian.' : 'Pantau persediaan dan riwayat pemakaian pakan.' }}</p>
+@if ($canWrite)
+    <a href="{{ route('feedstocks.index') }}" class="mt-3 inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium hover:bg-slate-50">@include('partials.icon', ['name' => 'tag', 'class' => 'h-4 w-4']) Kelola jenis pakan</a>
+@endif
 
 <div class="mt-6 grid gap-4 sm:grid-cols-3">
     <div class="rounded-xl border border-slate-200 bg-white p-5">
@@ -167,24 +170,23 @@
     <div class="mt-4 overflow-x-auto">
         <table class="w-full min-w-[720px] text-left text-sm">
             <thead class="bg-slate-50 text-xs text-slate-500">
-                <tr><th class="px-4 py-3 font-medium">Kode</th><th class="px-4 py-3 font-medium">Waktu</th><th class="px-4 py-3 font-medium">Jenis pakan</th><th class="px-4 py-3 font-medium">Transaksi</th><th class="px-4 py-3 font-medium">Jumlah</th><th class="px-4 py-3 font-medium">Tujuan</th><th class="px-4 py-3 font-medium">Pencatat</th>@if ($canWrite)<th class="px-4 py-3 font-medium">Aksi</th>@endif</tr>
+                <tr><th class="px-4 py-3 font-medium">Kode</th><th class="px-4 py-3 font-medium">Waktu</th><th class="px-4 py-3 font-medium">Jenis pakan</th><th class="px-4 py-3 font-medium">Transaksi</th><th class="px-4 py-3 font-medium">Jumlah</th><th class="px-4 py-3 font-medium">Tujuan</th>@if ($canWrite)<th class="px-4 py-3 font-medium">Aksi</th>@endif</tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
                 @forelse ($history as $t)
                     <tr>
                         <td class="px-4 py-3.5 text-slate-500">{{ $t->code() }}</td>
-                        <td class="px-4 py-3.5">{{ $t->created_at->translatedFormat('d M • H.i') }}</td>
+                        <td class="px-4 py-3.5">{{ $t->created_at->translatedFormat('d M • H.i') }}<span class="mt-0.5 block text-xs text-slate-400">Dicatat oleh: {{ $t->user->name }}</span></td>
                         <td class="px-4 py-3.5">{{ $t->feed->feed_type }}</td>
                         <td class="px-4 py-3.5">{{ $t->type === 'keluar' ? 'Pemakaian' : 'Pakan masuk' }}</td>
                         <td class="px-4 py-3.5 font-medium {{ $t->type === 'keluar' ? 'text-slate-700' : 'text-brand-600' }}">{{ $t->type === 'keluar' ? '−' : '+' }}@num($t->quantity) kg</td>
                         <td class="px-4 py-3.5 text-slate-500">{{ $t->pond?->name ?? 'Gudang' }}</td>
-                        <td class="px-4 py-3.5 text-slate-500">{{ $t->user->name }}</td>
                         @if ($canWrite)
                             <td class="px-4 py-3.5">@include('partials.row-actions', ['edit' => route('feed.edit', $t), 'destroy' => route('feed.destroy', $t), 'confirm' => 'Hapus transaksi '.$t->code().'? Stok akan dikembalikan.'])</td>
                         @endif
                     </tr>
                 @empty
-                    <tr><td colspan="{{ $canWrite ? 8 : 7 }}" class="px-4 py-6 text-slate-500">Belum ada transaksi pakan.{{ $canWrite ? ' Catat pemakaian atau pakan masuk pertama Anda di atas.' : '' }}</td></tr>
+                    <tr><td colspan="{{ $canWrite ? 7 : 6 }}" class="px-4 py-6 text-slate-500">Belum ada transaksi pakan.{{ $canWrite ? ' Catat pemakaian atau pakan masuk pertama Anda di atas.' : '' }}</td></tr>
                 @endforelse
             </tbody>
         </table>

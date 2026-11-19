@@ -1,13 +1,13 @@
 @extends('layouts.app')
-@section('title', 'Laba Rugi')
-@section('crumb', 'Laba Rugi')
+@section('title', 'Keuangan & Laba Rugi')
+@section('crumb', 'Keuangan & Laba Rugi')
 
 @section('content')
 @php $canWrite = auth()->user()->isPengelola(); @endphp
 
 <div class="flex flex-wrap items-start justify-between gap-4">
     <div>
-        <h1 class="text-3xl font-normal tracking-tight">Laba rugi</h1>
+        <h1 class="text-3xl font-normal tracking-tight">Keuangan &amp; laba rugi</h1>
         <p class="mt-2 text-sm text-slate-500">Ringkasan pendapatan panen dan biaya pembelian pakan pada periode terpilih.</p>
     </div>
     <div class="flex items-center gap-2">
@@ -154,7 +154,7 @@
             <tbody class="divide-y divide-slate-100">
                 @forelse ($history as $t)
                     <tr>
-                        <td class="px-4 py-3.5 font-medium">{{ $t->transaction_date->translatedFormat('d M Y') }}</td>
+                        <td class="px-4 py-3.5 font-medium">{{ $t->transaction_date->translatedFormat('d M Y') }}<span class="mt-0.5 block text-xs text-slate-400">Dicatat oleh: {{ $t->user->name }}</span></td>
                         <td class="px-4 py-3.5 text-slate-600">{{ $t->isRevenue() ? 'Pendapatan panen' : 'Pembelian pakan' }}</td>
                         <td class="px-4 py-3.5 text-slate-500">{{ $t->isRevenue() ? ($t->pond?->fish_type.' • '.$t->pond?->name) : ($t->feed?->feed_type ?? '-') }}</td>
                         <td class="px-4 py-3.5 text-slate-500">@num($t->weight_kg) kg</td>
@@ -165,7 +165,7 @@
                                 @if ($t->isRevenue())
                                     @include('partials.row-actions', ['edit' => route('finance.edit', $t), 'destroy' => route('finance.destroy', $t), 'confirm' => 'Hapus penjualan panen ini?'])
                                 @else
-                                    <a href="{{ route('feed.index') }}" class="text-xs text-slate-500 underline">Kelola di Stok Pakan</a>
+                                    <a href="{{ route('feed.index') }}" class="text-xs text-slate-500 underline">Kelola di Stok &amp; Jenis Pakan</a>
                                 @endif
                             </td>
                         @endif

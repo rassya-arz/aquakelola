@@ -13,7 +13,7 @@ class WaterQuality extends Model
     public const STATUS_DALAM_BATAS = 'dalam_batas';
     public const STATUS_DI_LUAR_BATAS = 'di_luar_batas';
 
-    protected $fillable = ['pond_id', 'ph_level', 'status', 'measured_at', 'user_id'];
+    protected $fillable = ['pond_id', 'ph_level', 'status', 'measured_at', 'catatan', 'user_id'];
 
     protected function casts(): array
     {
@@ -43,7 +43,7 @@ class WaterQuality extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withDefault(['name' => 'Akun dihapus']);
     }
 
     /**

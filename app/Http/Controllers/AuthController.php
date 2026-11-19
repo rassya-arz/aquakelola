@@ -58,7 +58,8 @@ class AuthController extends Controller
         RateLimiter::clear($key);
         $request->session()->regenerate();
 
-        return $this->redirectByRole();
+        // Kedua peran (pengelola & mitra/pemilik) memiliki akses ke Dashboard.
+        return redirect()->route('dashboard');
     }
 
     public function logout(Request $request): RedirectResponse
@@ -68,13 +69,5 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('login');
-    }
-
-    /** Pengelola -> dashboard operasional, Mitra -> panel laporan (Laba Rugi). */
-    public function redirectByRole(): RedirectResponse
-    {
-        return Auth::user()->isPengelola()
-            ? redirect()->route('dashboard')
-            : redirect()->route('finance.index');
     }
 }

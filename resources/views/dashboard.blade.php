@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'Home')
-@section('crumb', 'Home')
+@section('title', 'Dashboard')
+@section('crumb', 'Dashboard')
 
 @section('content')
 <div class="flex flex-wrap items-start justify-between gap-4">
@@ -70,8 +70,8 @@
                         <span class="rounded-md px-2.5 py-1 text-xs font-medium {{ $w->isOutOfRange() ? 'bg-red-50 text-red-600' : 'bg-brand-50 text-brand-700' }}">
                             {{ $w->isOutOfRange() ? 'Di luar batas' : 'Dalam batas' }}
                         </span>
-                    @elseif ($pond->isPanen())
-                        <span class="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">Panen</span>
+                    @elseif (! $pond->isAktif())
+                        <span class="rounded-md px-2.5 py-1 text-xs font-medium {{ $pond->isPerbaikan() ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-600' }}">{{ $pond->statusLabel() }}</span>
                     @else
                         <span class="text-xs text-slate-400">Belum ada data</span>
                     @endif

@@ -11,6 +11,16 @@ class Pond extends Model
 {
     public const STATUS_AKTIF = 'aktif';
     public const STATUS_PANEN = 'panen';
+    public const STATUS_PERBAIKAN = 'perbaikan';
+
+    public const STATUS_LABELS = [
+        self::STATUS_AKTIF => 'Aktif',
+        self::STATUS_PANEN => 'Panen',
+        self::STATUS_PERBAIKAN => 'Perbaikan',
+    ];
+
+    /** Saran awal untuk input jenis ikan; jenis lain yang pernah disimpan ikut ditambahkan. */
+    public const DEFAULT_FISH_TYPES = ['Nila', 'Lele', 'Gurame', 'Patin'];
 
     protected $fillable = ['name', 'fish_type', 'status', 'cycle_started_at'];
 
@@ -26,8 +36,8 @@ class Pond extends Model
                 return;
             }
 
-            if ($pond->status === self::STATUS_AKTIF) {
-                // Panen -> Aktif: mulai siklus baru, catatan terkait mulai dari 0.
+            // Hanya Panen -> Aktif yang memulai siklus baru. Perbaikan -> Aktif melanjutkan siklus berjalan.
+            if ($pond->status === self::STATUS_AKTIF && $pond->getOriginal('status') === self::STATUS_PANEN) {
                 $pond->cycle_started_at = now();
             }
         });
@@ -41,6 +51,27 @@ class Pond extends Model
     public function isPanen(): bool
     {
         return $this->status === self::STATUS_PANEN;
+    }
+
+    public function isPerbaikan(): bool
+    {
+        return $this->status === self::STATUS_PERBAIKAN;
+    }
+
+    public function statusLabel(): string
+    {
+        return self::STATUS_LABELS[$this->status] ?? ucfirst((string) $this->status);
+    }
+
+    /** Daftar saran jenis ikan (bawaan + yang sudah tersimpan), tanpa duplikat huruf besar/kecil. */
+    public static function fishTypeSuggestions(): array
+    {
+        return collect(self::DEFAULT_FISH_TYPES)
+            ->merge(static::query()->distinct()->pluck('fish_type'))
+            ->unique(fn (string $v) => mb_strtolower($v))
+            ->sortBy(fn (string $v) => mb_strtolower($v))
+            ->values()
+            ->all();
     }
 
     public function scopeAktif(Builder $query): Builder

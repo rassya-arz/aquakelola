@@ -11,8 +11,8 @@ return new class extends Migration
         Schema::create('ponds', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->enum('fish_type', ['Nila', 'Lele']);
-            $table->enum('status', ['aktif', 'panen'])->default('aktif');
+            $table->string('fish_type', 50); // bebas diketik (Nila, Lele, Gurame, Patin, dst.)
+            $table->enum('status', ['aktif', 'panen', 'perbaikan'])->default('aktif');
             // Awal siklus budidaya saat ini; catatan terkait kolam dihitung sejak waktu ini.
             $table->timestamp('cycle_started_at')->nullable();
             $table->timestamps();

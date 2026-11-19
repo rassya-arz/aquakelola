@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'Pengecekan pH Air')
-@section('crumb', 'Pengecekan pH Air')
+@section('title', 'Monitoring pH Air')
+@section('crumb', 'Monitoring pH Air')
 
 @php
     $canWrite = auth()->user()->isPengelola();
@@ -8,7 +8,7 @@
 @endphp
 
 @section('content')
-<h1 class="text-3xl font-normal tracking-tight">Pengecekan pH air</h1>
+<h1 class="text-3xl font-normal tracking-tight">Monitoring pH air</h1>
 <p class="mt-2 text-sm text-slate-500">Catat hasil pengukuran manual dan kenali perubahan kualitas air lebih awal.</p>
 
 {{-- Peringatan aktif: hilang otomatis setelah ada pengukuran ulang dalam batas --}}
@@ -19,6 +19,7 @@
         <div>
             <p class="font-medium">Peringatan aktif: {{ $pond->name }} pH @num($w->ph_level) {{ $w->ph_level > $maxPh ? '> batas atas' : '< batas bawah' }} {{ \App\Support\Fmt::num($w->ph_level > $maxPh ? $maxPh : $minPh) }}</p>
             <p class="mt-1 text-xs">Pengukuran {{ $w->measured_at->translatedFormat('d M Y, H.i') }}. Peringatan hilang setelah pengukuran ulang berada dalam batas {{ $range }}.</p>
+            @if ($w->catatan)<p class="mt-1 text-xs"><span class="font-medium">Tindakan:</span> {{ $w->catatan }} <span class="text-red-500">({{ $w->user->name }})</span></p>@endif
         </div>
     </section>
 @endforeach
@@ -27,7 +28,7 @@
 <div class="mt-6 grid gap-4 md:grid-cols-3">
     @foreach ($ponds as $pond)
         @php $w = $pond->isAktif() ? $pond->latestWater : null; @endphp
-        <div class="rounded-xl border bg-white p-5 {{ $w && $w->isOutOfRange() ? 'border-red-200' : 'border-slate-200' }} {{ $pond->isPanen() ? 'opacity-70' : '' }}">
+        <div class="rounded-xl border bg-white p-5 {{ $w && $w->isOutOfRange() ? 'border-red-200' : 'border-slate-200' }} {{ ! $pond->isAktif() ? 'opacity-70' : '' }}">
             <div class="flex items-start justify-between">
                 <div>
                     <p class="font-medium">{{ $pond->name }}</p>
@@ -35,12 +36,14 @@
                 </div>
                 @if ($w)
                     <span class="rounded-md px-2.5 py-1 text-xs font-medium {{ $w->isOutOfRange() ? 'bg-red-50 text-red-600' : 'bg-brand-50 text-brand-700' }}">{{ $w->isOutOfRange() ? 'Di luar batas' : 'Dalam batas' }}</span>
+                @elseif (! $pond->isAktif())
+                    <span class="rounded-md px-2.5 py-1 text-xs font-medium {{ $pond->isPerbaikan() ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-600' }}">{{ $pond->statusLabel() }}</span>
                 @endif
             </div>
             @if ($w)
                 <div class="mt-5"><p class="text-4xl font-light">@num($w->ph_level)</p><p class="mt-1 text-xs text-slate-500">pH air</p></div>
-            @elseif ($pond->isPanen())
-                <p class="mt-5 text-sm text-slate-500">Kolam berstatus panen. Monitoring pH nonaktif sampai status diubah menjadi Aktif.</p>
+            @elseif (! $pond->isAktif())
+                <p class="mt-5 text-sm text-slate-500">Kolam sedang dalam tahap {{ $pond->isPerbaikan() ? 'perbaikan' : 'panen' }}. Monitoring pH nonaktif sampai status diubah menjadi Aktif.</p>
             @else
                 <p class="mt-5 text-sm text-slate-500">Belum ada pengukuran.</p>
             @endif
@@ -90,8 +93,13 @@
                 <input id="measured_at" name="measured_at" type="datetime-local" max="{{ now()->format('Y-m-d\TH:i') }}" value="{{ old('measured_at', now()->format('Y-m-d\TH:i')) }}"
                        class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-3 text-sm">
             </div>
+            <div>
+                <label class="text-sm font-medium" for="catatan">Catatan / Tindakan <span class="font-normal text-slate-400">(Opsional)</span></label>
+                <textarea id="catatan" name="catatan" rows="2" maxlength="255" placeholder="Misal: Penggantian air 30% atau pemberian kapur dolomit"
+                          class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-3 text-sm">{{ old('catatan') }}</textarea>
+            </div>
             <p x-show="has && !out" x-cloak class="rounded-lg bg-brand-50 p-3 text-xs text-brand-700">pH ini berada dalam batas {{ $range }}.</p>
-            <p x-show="out" x-cloak class="rounded-lg bg-red-50 p-3 text-xs text-red-700">pH ini di luar batas {{ $range }}. Setelah disimpan, peringatan akan muncul di halaman ini.</p>
+            <p x-show="out" x-cloak class="rounded-lg bg-red-50 p-3 text-xs text-red-700">pH ini di luar batas {{ $range }}. Setelah disimpan, peringatan akan muncul di halaman ini. Sebaiknya isi catatan tindakan yang Anda ambil.</p>
             <button class="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-5 py-3 text-sm font-medium text-white hover:bg-brand-700">
                 @include('partials.icon', ['name' => 'plus', 'class' => 'h-4 w-4']) Simpan pengukuran
             </button>
@@ -104,25 +112,25 @@
 <section class="mt-6 rounded-xl border border-slate-200 bg-white p-6">
     <h2 class="font-medium">Riwayat pengukuran</h2>
     <div class="mt-4 overflow-x-auto">
-        <table class="w-full min-w-[640px] text-left text-sm">
+        <table class="w-full min-w-[760px] text-left text-sm">
             <thead class="bg-slate-50 text-xs text-slate-500">
                 <tr>
                     <th class="px-4 py-3 font-medium">Waktu</th>
                     <th class="px-4 py-3 font-medium">Kolam</th>
                     <th class="px-4 py-3 font-medium">pH air</th>
                     <th class="px-4 py-3 font-medium">Status</th>
-                    <th class="px-4 py-3 font-medium">Pencatat</th>
+                    <th class="px-4 py-3 font-medium">Catatan / Tindakan</th>
                     @if ($canWrite)<th class="px-4 py-3 font-medium">Aksi</th>@endif
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
                 @forelse ($history as $r)
                     <tr>
-                        <td class="px-4 py-3.5">{{ $r->measured_at->translatedFormat('d M • H.i') }}</td>
+                        <td class="px-4 py-3.5">{{ $r->measured_at->translatedFormat('d M • H.i') }}<span class="mt-0.5 block text-xs text-slate-400">Dicatat oleh: {{ $r->user->name }}</span></td>
                         <td class="px-4 py-3.5">{{ $r->pond->name }}</td>
                         <td class="px-4 py-3.5">@num($r->ph_level)</td>
                         <td class="px-4 py-3.5"><span class="rounded-md px-2.5 py-1 text-xs font-medium {{ $r->isOutOfRange() ? 'bg-red-50 text-red-600' : 'bg-brand-50 text-brand-700' }}">{{ $r->isOutOfRange() ? 'Di luar batas' : 'Dalam batas' }}</span></td>
-                        <td class="px-4 py-3.5 text-slate-500">{{ $r->user->name }}</td>
+                        <td class="max-w-xs px-4 py-3.5 text-slate-600">{{ $r->catatan ?: '—' }}</td>
                         @if ($canWrite)
                             <td class="px-4 py-3.5">@include('partials.row-actions', ['destroy' => route('water.destroy', $r), 'confirm' => 'Hapus pengukuran ini?'])</td>
                         @endif

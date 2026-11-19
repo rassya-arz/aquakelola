@@ -22,7 +22,7 @@ class FinancialController extends Controller
         $filter = in_array($request->query('type'), [FinancialTransaction::TYPE_PENDAPATAN_PANEN, FinancialTransaction::TYPE_PEMBELIAN_PAKAN], true)
             ? $request->query('type') : 'semua';
 
-        $history = FinancialTransaction::with(['pond', 'feed'])
+        $history = FinancialTransaction::with(['pond', 'feed', 'user'])
             ->whereBetween('transaction_date', [$start, $end])
             ->when($filter !== 'semua', fn ($q) => $q->where('type', $filter))
             ->orderByDesc('transaction_date')->orderByDesc('id')
@@ -97,7 +97,7 @@ class FinancialController extends Controller
         $month = Period::month($request);
         $summary = FinancialTransaction::monthSummary($month);
 
-        $rows = FinancialTransaction::with(['pond', 'feed'])
+        $rows = FinancialTransaction::with(['pond', 'feed', 'user'])
             ->whereBetween('transaction_date', [$month->copy()->startOfMonth(), $month->copy()->endOfMonth()])
             ->orderBy('transaction_date')->orderBy('id')->get();
 
@@ -107,7 +107,7 @@ class FinancialController extends Controller
             $out = fopen('php://output', 'w');
             fwrite($out, "\xEF\xBB\xBF"); // BOM agar Excel membaca UTF-8
 
-            fputcsv($out, ['Tanggal', 'Transaksi', 'Rincian', 'Jumlah (kg)', 'Harga/kg', 'Nilai (Rp)']);
+            fputcsv($out, ['Tanggal', 'Transaksi', 'Rincian', 'Jumlah (kg)', 'Harga/kg', 'Nilai (Rp)', 'Dicatat oleh']);
             foreach ($rows as $r) {
                 fputcsv($out, [
                     $r->transaction_date->toDateString(),
@@ -116,6 +116,7 @@ class FinancialController extends Controller
                     $r->weight_kg,
                     $r->price_per_kg,
                     $r->isRevenue() ? $r->total_amount : -$r->total_amount,
+                    $this->csvSafe($r->user->name),
                 ]);
             }
 
@@ -180,7 +181,7 @@ class FinancialController extends Controller
     /** Pembelian pakan dibuat otomatis dari transaksi pakan masuk, jadi dikelola dari halaman Stok Pakan. */
     private function ensureRevenue(FinancialTransaction $tx): void
     {
-        abort_unless($tx->isRevenue(), 403, 'Pembelian pakan dikelola dari halaman Stok Pakan.');
+        abort_unless($tx->isRevenue(), 403, 'Pembelian pakan dikelola dari halaman Stok & Jenis Pakan.');
     }
 
     /** Cegah formula injection saat CSV dibuka di Excel/Sheets. */

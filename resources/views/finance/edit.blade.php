@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('title', 'Ubah Penjualan Panen')
-@section('crumb', 'Laba Rugi / Ubah')
+@section('crumb', 'Keuangan & Laba Rugi / Ubah')
 
 @section('content')
 <h1 class="text-3xl font-normal tracking-tight">Ubah penjualan panen</h1>

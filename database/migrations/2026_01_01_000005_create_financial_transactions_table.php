@@ -20,7 +20,7 @@ return new class extends Migration
             $table->decimal('price_per_kg', 12, 2);
             $table->decimal('total_amount', 14, 2);
             $table->date('transaction_date');
-            $table->foreignId('user_id')->constrained('users')->restrictOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete(); // pencatat; riwayat tetap ada bila akun dihapus
             $table->timestamps();
 
             $table->index(['type', 'transaction_date']);

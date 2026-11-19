@@ -1,10 +1,10 @@
 @extends('layouts.app')
 @section('title', 'Jenis Pakan')
-@section('crumb', 'Jenis Pakan')
+@section('crumb', 'Stok & Jenis Pakan / Jenis Pakan')
 
 @section('content')
 <h1 class="text-3xl font-normal tracking-tight">Jenis pakan</h1>
-<p class="mt-2 text-sm text-slate-500">Kelola jenis pakan, stok minimum, dan harga acuan. Jumlah stok berubah lewat transaksi di halaman Stok Pakan.</p>
+<p class="mt-2 text-sm text-slate-500">Kelola jenis pakan, stok minimum, dan harga acuan. Jumlah stok berubah lewat transaksi di halaman <a href="{{ route('feed.index') }}" class="underline">Stok &amp; Jenis Pakan</a>.</p>
 
 <div class="mt-6 grid gap-4 lg:grid-cols-3">
     <section class="rounded-xl border border-slate-200 bg-white p-6 lg:col-span-2">

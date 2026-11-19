@@ -16,7 +16,7 @@ return new class extends Migration
             $table->enum('type', ['masuk', 'keluar']);
             $table->decimal('quantity', 10, 2);
             $table->string('notes')->nullable();
-            $table->foreignId('user_id')->constrained('users')->restrictOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete(); // pencatat; riwayat tetap ada bila akun dihapus
             $table->timestamps();
 
             $table->index(['feed_id', 'type']);

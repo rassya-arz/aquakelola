@@ -1,10 +1,10 @@
 @extends('layouts.app')
-@section('title', 'Pengguna')
-@section('crumb', 'Pengguna')
+@section('title', 'Manajemen Pengguna')
+@section('crumb', 'Manajemen Pengguna')
 
 @section('content')
 @php $mitraCount = $users->where('role', \App\Models\User::ROLE_MITRA_PEMILIK)->count(); @endphp
-<h1 class="text-3xl font-normal tracking-tight">Pengguna</h1>
+<h1 class="text-3xl font-normal tracking-tight">Manajemen pengguna</h1>
 <p class="mt-2 text-sm text-slate-500">Kelola akun pengelola dan mitra / pemilik yang dapat masuk ke aplikasi.</p>
 
 <div class="mt-6 grid gap-4 lg:grid-cols-3">

@@ -14,7 +14,8 @@ return new class extends Migration
             $table->decimal('ph_level', 4, 2);
             $table->enum('status', ['dalam_batas', 'di_luar_batas']);
             $table->dateTime('measured_at');
-            $table->foreignId('user_id')->constrained('users')->restrictOnDelete();
+            $table->string('catatan', 255)->nullable(); // catatan / tindakan pengelola (opsional)
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete(); // pencatat; riwayat tetap ada bila akun dihapus
             $table->timestamps();
 
             $table->index(['pond_id', 'measured_at']);

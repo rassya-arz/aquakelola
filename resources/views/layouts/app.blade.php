@@ -23,13 +23,12 @@
 @php
     $user = auth()->user();
     $nav = [
-        ['dashboard', 'Home', 'home', 'dashboard', ['pengelola', 'mitra_pemilik']],
-        ['feed.index', 'Stok Pakan', 'box', 'feed.*', ['pengelola', 'mitra_pemilik']],
-        ['water.index', 'Pengecekan pH Air', 'drop', 'water.*', ['pengelola', 'mitra_pemilik']],
-        ['finance.index', 'Laba Rugi', 'chart', 'finance.*', ['pengelola', 'mitra_pemilik']],
-        ['ponds.index', 'Data Kolam', 'pond', 'ponds.*', ['pengelola']],
-        ['feedstocks.index', 'Jenis Pakan', 'tag', 'feedstocks.*', ['pengelola']],
-        ['users.index', 'Pengguna', 'users', 'users.*', ['mitra_pemilik']],
+        ['dashboard', 'Dashboard', 'home', ['dashboard'], ['pengelola', 'mitra_pemilik']],
+        ['ponds.index', 'Data Kolam', 'pond', ['ponds.*'], ['pengelola']],
+        ['water.index', 'Monitoring pH Air', 'drop', ['water.*'], ['pengelola', 'mitra_pemilik']],
+        ['feed.index', 'Stok & Jenis Pakan', 'box', ['feed.*', 'feedstocks.*'], ['pengelola', 'mitra_pemilik']],
+        ['finance.index', 'Keuangan & Laba Rugi', 'chart', ['finance.*'], ['pengelola', 'mitra_pemilik']],
+        ['users.index', 'Manajemen Pengguna', 'users', ['users.*'], ['mitra_pemilik']],
     ];
 @endphp
 <body class="bg-slate-50 font-sans text-slate-800 antialiased" x-data="{ open: false }">
@@ -49,7 +48,7 @@
             @foreach ($nav as [$route, $label, $icon, $pattern, $roles])
                 @if (in_array($user->role, $roles, true))
                     <a href="{{ route($route) }}"
-                       class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm {{ request()->routeIs($pattern) ? 'bg-brand-50 font-medium text-brand-700' : 'text-slate-600 hover:bg-slate-50' }}">
+                       class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm {{ request()->routeIs(...$pattern) ? 'bg-brand-50 font-medium text-brand-700' : 'text-slate-600 hover:bg-slate-50' }}">
                         @include('partials.icon', ['name' => $icon])
                         {{ $label }}
                     </a>

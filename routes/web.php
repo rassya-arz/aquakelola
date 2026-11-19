@@ -17,7 +17,7 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/', [AuthController::class, 'redirectByRole'])->name('home');
+    Route::redirect('/', '/dashboard')->name('home');
 
     // Pengelola & Mitra/Pemilik: hanya melihat laporan dan monitoring (read-only).
     Route::middleware('role:pengelola,mitra_pemilik')->group(function () {
